@@ -886,7 +886,7 @@ namespace CHO.Json
         }
         private static bool IsNumberStartChar(char c)
         {
-            return c >= '0' && c <= '9';
+            return c >= '0' && c <= '9' || c == '-';
         }
         private static bool IsNumberParsingChar(char c)
         {
