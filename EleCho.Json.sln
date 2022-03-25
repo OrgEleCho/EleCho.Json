@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32210.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EleCho.JsonTestConsole", "EleCho.Json_TestConsole\EleCho.JsonTestConsole.csproj", "{1470525F-7AD8-43AF-9A27-BA9FEDCBD047}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EleCho.JsonTestConsole", "TestConsole\TestConsole.csproj", "{1470525F-7AD8-43AF-9A27-BA9FEDCBD047}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EleCho.Json.Legacy", "EleCho.Json.Legacy\EleCho.Json.Legacy.csproj", "{529FB59E-F874-473D-9014-5523F850089F}"
 EndProject

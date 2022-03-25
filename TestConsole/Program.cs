@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using EleCho.Json;
 
-namespace CHO_Json_TestConsole
+namespace TestConsole
 {
     class Program
     {

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1470525F-7AD8-43AF-9A27-BA9FEDCBD047}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CHO_Json_TestConsole</RootNamespace>
-    <AssemblyName>CHO-Json_TestConsole</AssemblyName>
+    <RootNamespace>TestConsole</RootNamespace>
+    <AssemblyName>TestConsole</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
