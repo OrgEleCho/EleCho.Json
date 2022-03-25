@@ -1,0 +1,54 @@
+{
+  "message": "获取画作详情成功",
+  "data": {
+    "id": 86896933,
+    "artistId": 4378,
+    "title": "あーこちゃんまとめ",
+    "type": "illust",
+    "caption": "担当させていただいている、にじさんじ所属ライバー朝日南アカネさんのお祝い絵まとめです！<br /><br />■Youtubeチャンネル<br /><a href=\"https://www.youtube.com/channel/UCe_p3YEuYJb8Np0Ip9dk-FQ\" target=\"_blank\">https://www.youtube.com/channel/UCe_p3YEuYJb8Np0Ip9dk-FQ</a>",
+    "artistPreView": {
+      "id": 4378,
+      "name": "えいひ",
+      "account": "eihi",
+      "avatar": "https://i.pximg.net/user-profile/img/2009/07/22/16/28/24/935667_48029b179068620d705e908f5eac3abd_170.jpg"
+    },
+    "tags": [
+      {
+        "name": "朝日南アカネ",
+        "translatedName": "",
+        "id": 341879508
+      },
+      {
+        "name": "赤髪ポニーテール",
+        "translatedName": "",
+        "id": 191520026
+      }
+    ],
+    "imageUrls": [
+      {
+        "squareMedium": "https://i.pximg.net/c/360x360_10_webp/img-master/img/2021/01/08/03/03/06/86896933_p0_square1200.jpg",
+        "medium": "https://i.pximg.net/c/540x540_70/img-master/img/2021/01/08/03/03/06/86896933_p0_master1200.jpg",
+        "large": "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2021/01/08/03/03/06/86896933_p0_master1200.jpg",
+        "original": "https://i.pximg.net/img-original/img/2021/01/08/03/03/06/86896933_p0.png"
+      },
+      {
+        "squareMedium": "https://i.pximg.net/c/360x360_10_webp/img-master/img/2021/01/08/03/03/06/86896933_p1_square1200.jpg",
+        "medium": "https://i.pximg.net/c/540x540_70/img-master/img/2021/01/08/03/03/06/86896933_p1_master1200.jpg",
+        "large": "https://i.pximg.net/c/600x1200_90_webp/img-master/img/2021/01/08/03/03/06/86896933_p1_master1200.jpg",
+        "original": "https://i.pximg.net/img-original/img/2021/01/08/03/03/06/86896933_p1.png"
+      }
+    ],
+    "tools": [
+      "Photoshop"
+    ],
+    "createDate": "2021-01-08",
+    "pageCount": 2,
+    "width": 788,
+    "height": 1113,
+    "sanityLevel": 2,
+    "restrict": 0,
+    "totalView": 8596,
+    "totalBookmarks": 1521,
+    "xrestrict": 0
+  }
+}

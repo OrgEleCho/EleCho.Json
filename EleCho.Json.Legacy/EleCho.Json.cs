@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 
 
-namespace CHO.Json
+namespace EleCho.Json.Legacy
 {
     /// <summary>
     /// 表示Json数据类型异常
@@ -33,20 +33,18 @@ namespace CHO.Json
     public class InvalidCharParseException : Exception
     {
         private readonly string message;
-        private readonly int index;
-        public InvalidCharParseException(string message, int index)
+        public InvalidCharParseException(string message)
         {
             this.message = message;
-            this.index = index;
         }
         public override string Message
         {
-            get => message;
+            get
+            {
+                return message;
+            }
         }
-        public int Index
-        {
-            get => index;
-        }
+
     }
 
     /// <summary>
@@ -55,20 +53,18 @@ namespace CHO.Json
     public class NotClosedParseException : Exception
     {
         private readonly string message;
-        private readonly int index;
-        public NotClosedParseException(string message, int index)
+        public NotClosedParseException(string message)
         {
             this.message = message;
-            this.index = index;
         }
         public override string Message
         {
-            get => message;
+            get
+            {
+                return message;
+            }
         }
-        public int Index
-        {
-            get => index;
-        }
+
     }
 
     /// <summary>
@@ -77,20 +73,18 @@ namespace CHO.Json
     public class ParseCallError : Exception
     {
         private readonly string message;
-        private readonly int index;
-        public ParseCallError(string message, int index)
+        public ParseCallError(string message)
         {
             this.message = message;
-            this.index = index;
         }
         public override string Message
         {
-            get => message;
+            get
+            {
+                return message;
+            }
         }
-        public int Index
-        {
-            get => index;
-        }
+
     }
 
     /// <summary>
@@ -99,56 +93,52 @@ namespace CHO.Json
     public class ParseUnknownError : Exception
     {
         private readonly string message;
-        private readonly int index;
-        public ParseUnknownError(string message, int index)
+        public ParseUnknownError(string message)
         {
             this.message = message;
-            this.index = index;
         }
         public override string Message
         {
-            get => message;
+            get
+            {
+                return message;
+            }
         }
-        public int Index
-        {
-            get => index;
-        }
+
     }
 
     /// <summary>
     /// 表示分析Json数据时的Json格式异常
     /// </summary>
-    public class JsonFormatParseException : FormatException
+    public class JsonFormatParseException : Exception
     {
         private readonly string message;
-        private readonly int index;
-        public JsonFormatParseException(string message, int index)
+        public JsonFormatParseException(string message)
         {
             this.message = message;
-            this.index = index;
         }
         public override string Message
         {
-            get => message;
+            get
+            {
+                return message;
+            }
         }
-        public int Index
-        {
-            get => index;
-        }
+
     }
     /// <summary>
     /// Json数据类型, 表示Json数据中包含数据的类型
     /// </summary>
     public enum JsonDataType
     {
-        Null,
         Object,
         Array,
         String,
         Integer,
         Float,
         Double,
-        Boolean
+        Boolean,
+        Null
     }
 
     /// <summary>
@@ -161,7 +151,10 @@ namespace CHO.Json
 
         public JsonDataType DataType
         {
-            get => dataType;
+            get
+            {
+                return dataType;
+            }
         }
 
         protected JsonData() { }
@@ -358,15 +351,19 @@ namespace CHO.Json
         }
 
 
-        public static T Deserialize<T>(string jsonText)
+        public static T Deserialize<T>(JsonData jsonData) where T : new()
         {
-            return (T)ConvertToInstance(Parse(jsonText), typeof(T));
+            return (T)Deserialize(jsonData, typeof(T));
         }
-        public static bool TryDeserialize<T>(string jsonText, out T result)
+        public static JsonData Serialize(object obj)
+        {
+            return Create(obj);
+        }
+        public static bool TryDeserialize<T>(JsonData jsonData, out T result) where T : new()
         {
             try
             {
-                result = Deserialize<T>(jsonText);
+                result = Deserialize<T>(jsonData);
                 return true;
             }
             catch
@@ -375,11 +372,7 @@ namespace CHO.Json
                 return false;
             }
         }
-        public static string Serialize(object obj)
-        {
-            return ConvertToText(Create(obj));
-        }
-        public static bool TrySerialize(object obj, out string result)
+        public static bool TrySerialize(object obj, out JsonData result)
         {
             try
             {
@@ -393,7 +386,7 @@ namespace CHO.Json
             }
         }
 
-        protected static object ConvertToInstance(JsonData jsonData, Type resultType)
+        protected static object Deserialize(JsonData jsonData, Type resultType)
         {
             if (jsonData.DataType == JsonDataType.Null || jsonData.content == null)
             {
@@ -416,7 +409,7 @@ namespace CHO.Json
                     {
                         foreach (JsonData i in (jsonData.content as IDictionary<JsonData, JsonData>).Keys)
                         {
-                            (result as IDictionary)[ConvertToInstance(i, geneticArgs[0])] = ConvertToInstance((jsonData.content as IDictionary<JsonData, JsonData>)[i], geneticArgs[1]);
+                            (result as IDictionary)[Deserialize(i, geneticArgs[0])] = Deserialize((jsonData.content as IDictionary<JsonData, JsonData>)[i], geneticArgs[1]);
                         }
                         return result;
                     }
@@ -430,7 +423,7 @@ namespace CHO.Json
                                 if (field != null)
                                 {
                                     JsonData value = (jsonData.content as IDictionary<JsonData, JsonData>)[i];
-                                    field.SetValue(result, ConvertToInstance(value, field.FieldType));
+                                    field.SetValue(result, Deserialize(value, field.FieldType));
                                 }
                                 else
                                 {
@@ -451,7 +444,7 @@ namespace CHO.Json
                     {
                         foreach (JsonData i in jsonData.content as IList<JsonData>)
                         {
-                            (result as IList).Add(ConvertToInstance(i, geneticTypes[0]));
+                            (result as IList).Add(Deserialize(i, geneticTypes[0]));
                         }
                         return result;
                     }
@@ -464,81 +457,6 @@ namespace CHO.Json
                 {
                     throw new JsonDataTypeException("未知类型的JsonData数据");
                 }
-            }
-        }
-        /// <summary>
-        /// 将JsonData实例中的数据反序列化为指定类型的实例
-        /// </summary>
-        /// <typeparam name="T">指定类型</typeparam>
-        /// <param name="jsonData">要进行操作的JsonData实例</param>
-        /// <returns></returns>
-        public static T ConvertToInstance<T>(JsonData jsonData)
-        {
-            return (T)ConvertToInstance(jsonData, typeof(T));
-        }
-        /// <summary>
-        /// 将JsonData实例中的数据转换成Json文本
-        /// 注意: 本程序集可以读取, 但其他容错值较小的Json操作程序集或包可能无法读取它
-        /// </summary>
-        /// <returns>String类型的Json文本</returns>
-        public static string ConvertToText(JsonData jsonData)
-        {
-            switch (jsonData.dataType)
-            {
-                case JsonDataType.Object:
-                    List<string> pairs = new List<string>();
-                    foreach (JsonData key in (jsonData.content as Dictionary<JsonData, JsonData>).Keys)
-                    {
-                        pairs.Add(string.Format("{0}: {1}", ConvertToText(key), ConvertToText((jsonData.content as Dictionary<JsonData, JsonData>)[key])));
-                    }
-                    return string.Format("{0}{1}{2}", "{", string.Join(", ", pairs), "}");
-                case JsonDataType.Array:
-                    List<string> elements = new List<string>();
-                    foreach (JsonData element in (jsonData.content as List<JsonData>))
-                    {
-                        elements.Add(ConvertToText(element));
-                    }
-                    return string.Format("[{0}]", string.Join(", ", elements));
-                case JsonDataType.String:
-                    return string.Format("\"{0}\"", ((string)jsonData.content).Replace("\\", "\\\\").Replace("\'", "\\\'").Replace("\"", "\\\"").Replace("\0", "\\0").Replace("\a", "\\a").Replace("\b", "\\b").Replace("\f", "\\f").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t").Replace("\v", "\\v"));
-                case JsonDataType.Integer:
-                    return ((int)jsonData.content).ToString();
-                case JsonDataType.Float:
-                    return ((float)jsonData.content).ToString();
-                case JsonDataType.Double:
-                    return ((double)jsonData.content).ToString();
-                case JsonDataType.Boolean:
-                    return (bool)jsonData.content ? "true" : "false";
-                case JsonDataType.Null:
-                    return "null";
-                default:
-                    throw new JsonDataTypeException("所访问数据类型未知");
-            }
-        }
-        public static bool TryConvertToInstance<T>(JsonData jsonData, out T result)
-        {
-            try
-            {
-                result = ConvertToInstance<T>(jsonData);
-                return true;
-            }
-            catch
-            {
-                result = default;
-                return false;
-            }
-        }
-        public static bool TryConvertToText(JsonData jsonData, out string result)
-        {
-            try
-            {
-                result = ConvertToText(jsonData);
-                return true;
-            }
-            catch
-            {
-                result = null;
-                return false;
             }
         }
 
@@ -656,6 +574,45 @@ namespace CHO.Json
         public object GetData()
         {
             return content;
+        }
+        /// <summary>
+        /// 将JsonData实例中的数据转换成Json文本
+        /// 注意: 本程序集可以读取, 但其他容错值较小的Json操作程序集或包可能无法读取它
+        /// </summary>
+        /// <returns>String类型的Json文本</returns>
+        public string ToJsonText()
+        {
+            switch (dataType)
+            {
+                case JsonDataType.Object:
+                    List<string> pairs = new List<string>();
+                    foreach (JsonData key in (content as Dictionary<JsonData, JsonData>).Keys)
+                    {
+                        pairs.Add(string.Format("{0}: {1}", key.ToJsonText(), (content as Dictionary<JsonData, JsonData>)[key].ToJsonText()));
+                    }
+                    return string.Format("{0}{1}{2}", "{", string.Join(", ", pairs), "}");
+                case JsonDataType.Array:
+                    List<string> elements = new List<string>();
+                    foreach (JsonData element in (content as List<JsonData>))
+                    {
+                        elements.Add(element.ToJsonText());
+                    }
+                    return string.Format("[{0}]", string.Join(", ", elements));
+                case JsonDataType.String:
+                    return string.Format("\"{0}\"", ((string)content).Replace("\\", "\\\\").Replace("\'", "\\\'").Replace("\"", "\\\"").Replace("\0", "\\0").Replace("\a", "\\a").Replace("\b", "\\b").Replace("\f", "\\f").Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t").Replace("\v", "\\v"));
+                case JsonDataType.Integer:
+                    return ((int)content).ToString();
+                case JsonDataType.Float:
+                    return ((float)content).ToString();
+                case JsonDataType.Double:
+                    return ((double)content).ToString();
+                case JsonDataType.Boolean:
+                    return (bool)content ? "true" : "false";
+                case JsonDataType.Null:
+                    return "null";
+                default:
+                    throw new JsonDataTypeException("所访问数据类型未知");
+            }
         }
 
         public static implicit operator JsonData(Dictionary<JsonData, JsonData> value)
@@ -870,37 +827,12 @@ namespace CHO.Json
             }
         }
 
-        //private readonly static char[] EmptyChars = " \n\r\t\0".ToCharArray();
-        //private readonly static char[] ParseEndChars = " :,}]\" \n\r\t\0".ToCharArray();
-        //private readonly static char[] ParseNumberChars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789.-".ToCharArray();
-        //private readonly static char[] ParseWordChars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm".ToCharArray();
-        //private readonly static char[] NumberChars = "0123456789-".ToCharArray();
-
-        private static bool IsEmptyChar(char c)
-        {
-            return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\0';
-        }
-        private static bool IsLetterChar(char c)
-        {
-            return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
-        }
-        private static bool IsNumberStartChar(char c)
-        {
-            return c >= '0' && c <= '9' || c == '-';
-        }
-        private static bool IsNumberParsingChar(char c)
-        {
-            return IsNumberStartChar(c) || c == '.' || c == '-' || IsLetterChar(c);
-        }
-        private static bool IsWordParseChar(char c)
-        {
-            return IsLetterChar(c) || c == '_';
-        }
-        private static bool IsEndChar(char c)
-        {
-            return IsEmptyChar(c) || c == '"' || c == ':' || c == ',' || c == ']' || c == '}';
-        }
-        protected static bool CheckInterface(Type targetType, Type interfaceType, out Type[] geneticTypes)
+        private readonly static char[] EmptyChars = " \n\r\t\0".ToCharArray();
+        private readonly static char[] ParseEndChars = " :,}]\" \n\r\t\0".ToCharArray();
+        private readonly static char[] ParseNumberChars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm0123456789.-".ToCharArray();
+        private readonly static char[] ParseWordChars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm".ToCharArray();
+        private readonly static char[] NumberChars = "0123456789-".ToCharArray();
+        private static bool CheckInterface(Type targetType, Type interfaceType, out Type[] geneticTypes)
         {
             foreach (Type i in targetType.GetInterfaces())
             {
@@ -943,7 +875,7 @@ namespace CHO.Json
         {
             for (; offset < source.Length; offset++)
             {
-                if (IsEmptyChar(source[offset]))
+                if (EmptyChars.Contains(source[offset]))
                 {
                     continue;
                 }
@@ -961,11 +893,11 @@ namespace CHO.Json
                     {
                         return ParseString(ref source, ref offset);
                     }
-                    else if (IsNumberStartChar(source[offset]))
+                    else if (NumberChars.Contains(source[offset]))
                     {
                         return ParseNumber(ref source, ref offset);
                     }
-                    else if (IsWordParseChar(source[offset]))
+                    else if (ParseWordChars.Contains(source[offset]))
                     {
                         return ParseWord(ref source, ref offset);
                     }
@@ -976,7 +908,7 @@ namespace CHO.Json
                     }
                     else
                     {
-                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                     }
                 }
             }
@@ -1038,7 +970,7 @@ namespace CHO.Json
                 }
                 else
                 {
-                    if (IsEmptyChar(source[offset]))
+                    if (EmptyChars.Contains(source[offset]))
                     {
                         continue;
                     }
@@ -1048,11 +980,11 @@ namespace CHO.Json
                     }
                     else
                     {
-                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                     }
                 }
             }
-            throw new NotClosedParseException("String无结束符号", offset);
+            throw new NotClosedParseException("String无结束符号");
         }
         protected static JsonData ParseNumber(ref char[] source, ref int offset)
         {
@@ -1063,54 +995,52 @@ namespace CHO.Json
             {
                 if (parsing)
                 {
-                    if (IsNumberParsingChar(source[offset]))
+                    if (ParseNumberChars.Contains(source[offset]))
                     {
                         content.Append(source[offset]);
                     }
-                    else if (IsEndChar(source[offset]))
+                    else if (ParseEndChars.Contains(source[offset]))
                     {
                         offset--;
                         break;
                     }
                     else
                     {
-                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                     }
                 }
                 else
                 {
-                    if (IsEmptyChar(source[offset]))
+                    if (EmptyChars.Contains(source[offset]))
                     {
                         continue;
                     }
-                    else if (IsNumberStartChar(source[offset]))
+                    else if (NumberChars.Contains(source[offset]))
                     {
                         parsing = true;
                         content.Append(source[offset]);
                     }
                     else
                     {
-                        throw new ParseCallError("未知错误! 一般情况下,此错误不会被触发", offset);
+                        throw new ParseCallError("未知错误! 一般情况下,此错误不会被触发");
                     }
                 }
             }
             try
             {
-                double doubleValue = double.Parse(content.ToString());
-                int intValue = (int)doubleValue;
-                float floatValue = (float)doubleValue;
+                double template = double.Parse(content.ToString());
 
-                if (doubleValue == intValue)
+                if (template == (int)template)
                 {
-                    return Create(intValue);
+                    return Create((int)template);
                 }
-                else if (doubleValue == floatValue)
+                else if (template == (float)template)
                 {
-                    return Create(floatValue);
+                    return Create((float)template);
                 }
                 else
                 {
-                    return Create(doubleValue);
+                    return Create(template);
                 }
             }
             catch (Exception ex)
@@ -1127,11 +1057,11 @@ namespace CHO.Json
             {
                 if (parsing)
                 {
-                    if (IsWordParseChar(source[offset]))
+                    if (ParseWordChars.Contains(source[offset]))
                     {
                         content.Append(source[offset]);
                     }
-                    else if (IsEndChar(source[offset]))
+                    else if (ParseEndChars.Contains(source[offset]))
                     {
                         offset--;
                         break;
@@ -1139,28 +1069,28 @@ namespace CHO.Json
                 }
                 else
                 {
-                    if (IsEmptyChar(source[offset]))
+                    if (EmptyChars.Contains(source[offset]))
                     {
                         continue;
                     }
-                    else if (IsWordParseChar(source[offset]))
+                    else if (ParseWordChars.Contains(source[offset]))
                     {
                         parsing = true;
                         content.Append(source[offset]);
                     }
                     else
                     {
-                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                     }
                 }
             }
-            switch (content.ToString())
+            switch (content.ToString().ToUpper())
             {
-                case "true":
+                case "TRUE":
                     return Create(true);
-                case "false":
+                case "FALSE":
                     return Create(false);
-                case "null":
+                case "NULL":
                     return CreateNull();
                 default:
                     throw new JsonDataTypeException(string.Format("未知的关键词'{0}'", content.ToString()));
@@ -1184,7 +1114,7 @@ namespace CHO.Json
                         parseState = ArrayParseState.ElementEnd;
                         break;
                     case ArrayParseState.ElementEnd:
-                        if (IsEmptyChar(source[offset]))
+                        if (EmptyChars.Contains(source[offset]))
                         {
                             continue;
                         }
@@ -1199,15 +1129,16 @@ namespace CHO.Json
                                 dataType = JsonDataType.Array,
                                 content = resultContainer
                             };
+                            offset++;
                             return result;
                         }
                         else
                         {
-                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                         }
                         break;
                     case ArrayParseState.NotStart:
-                        if (IsEmptyChar(source[offset]))
+                        if (EmptyChars.Contains(source[offset]))
                         {
                             continue;
                         }
@@ -1217,14 +1148,14 @@ namespace CHO.Json
                         }
                         else
                         {
-                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                         }
                         break;
 
                 }
             }
 
-            throw new NotClosedParseException("Array无结束符号", offset);
+            throw new NotClosedParseException("Array无结束符号");
         }
         protected static JsonData ParseObject(ref char[] source, ref int offset)
         {
@@ -1248,7 +1179,7 @@ namespace CHO.Json
                         }
                         break;
                     case ObjectParseState.KeyEnd:
-                        if (IsEmptyChar(source[offset]))
+                        if (EmptyChars.Contains(source[offset]))
                         {
                             continue;
                         }
@@ -1258,7 +1189,7 @@ namespace CHO.Json
                         }
                         else
                         {
-                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                         }
                         break;
                     case ObjectParseState.ValueStart:
@@ -1266,7 +1197,7 @@ namespace CHO.Json
                         parseState = ObjectParseState.ValueEnd;
                         break;
                     case ObjectParseState.ValueEnd:
-                        if (IsEmptyChar(source[offset]))
+                        if (EmptyChars.Contains(source[offset]))
                         {
                             continue;
                         }
@@ -1281,15 +1212,16 @@ namespace CHO.Json
                                 dataType = JsonDataType.Object,
                                 content = resultContainer
                             };
+                            offset++;
                             return result;
                         }
                         else
                         {
-                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                         }
                         break;
                     case ObjectParseState.NotStart:
-                        if (IsEmptyChar(source[offset]))
+                        if (EmptyChars.Contains(source[offset]))
                         {
                             continue;
                         }
@@ -1299,37 +1231,15 @@ namespace CHO.Json
                         }
                         else
                         {
-                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
+                            throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]));
                         }
                         break;
                 }
             }
 
-            throw new NotClosedParseException("Object无结束符号", offset);
+            throw new NotClosedParseException("Object无结束符号");
         }
 
-        /// <summary>
-        /// 从包含Json文本的字符数组中分析Json数据
-        /// </summary>
-        /// <param name="jsonText">Json文本</param>
-        /// <returns>包含Json数据的JsonData实例</returns>
-        public static JsonData Parse(char[] jsonText)
-        {
-            char[] source = jsonText;
-            int offset = 0;
-
-            JsonData result = ParseData(ref source, ref offset);
-
-            for (offset++; offset < source.Length; offset++)
-            {
-                if (!IsEmptyChar(source[offset]))
-                {
-                    throw new JsonFormatParseException("一个Json文本中不能出现两个元素并列的情况", offset);
-                }
-            }
-
-            return result;
-        }
         /// <summary>
         /// 从Json文本中分析Json数据
         /// </summary>
@@ -1342,547 +1252,15 @@ namespace CHO.Json
 
             JsonData result = ParseData(ref source, ref offset);
 
-            for (offset++; offset < source.Length; offset++)
-            {
-                if (!IsEmptyChar(source[offset]))
-                {
-                    throw new JsonFormatParseException("一个Json文本中不能出现两个元素并列的情况", offset);
-                }
-            }
-
-            return result;
-        }
-
-        enum RapidParseType
-        {
-            Object,
-            Array,
-            String,
-            Number,
-            Word,
-            None = -1
-        }
-        enum RapidArrayParseState
-        {
-            ItemAssignment,
-        }
-        enum RapidObjectParseState
-        {
-            KeyAssignment,
-            ValueAssignment,
-        }
-        class RapidParseStackInfo
-        {
-            public int ParseType = -1;
-            public int ParseState = 0;
-            public object ParseInfo = null;
-        }
-        class RapidStringParseInfo
-        {
-            public bool Escape;
-            public StringBuilder String;
-        }
-        class RapidNumberParseInfo
-        {
-            public StringBuilder Number;
-        }
-        class RapidWordParseInfo
-        {
-            public StringBuilder Word;
-        }
-        class RapidObjectParseInfo
-        {
-            public Dictionary<JsonData, JsonData> Object;
-            public JsonData TempKey;
-        }
-        class RapidArrayParseInfo
-        {
-            public List<JsonData> Array;
-        }
-        public static JsonData RapidParseData(ref char[] source, ref int offset)
-        {
-            Stack<RapidParseStackInfo> infos = new Stack<RapidParseStackInfo>();
-            JsonData popData = null;
-
-            infos.Push(new RapidParseStackInfo());
-
-            for (; offset < source.Length && infos.Count > 0; offset++)
-            {
-                RapidParseStackInfo info = infos.Peek();
-                switch(info.ParseType)
-                {
-                    case (int)RapidParseType.None:
-                        if (IsEmptyChar(source[offset]))
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            if (source[offset] == '{')
-                            {
-                                info.ParseType = (int)RapidParseType.Object;
-                                info.ParseState = (int)RapidObjectParseState.KeyAssignment;
-                                info.ParseInfo = new RapidObjectParseInfo()
-                                {
-                                    Object = new Dictionary<JsonData, JsonData>()
-                                };
-
-                                infos.Push(new RapidParseStackInfo());
-                            }
-                            else if (source[offset] == '[')
-                            {
-                                info.ParseType = (int)RapidParseType.Array;
-                                info.ParseState = (int)RapidArrayParseState.ItemAssignment;
-                                info.ParseInfo = new RapidArrayParseInfo()
-                                {
-                                    Array = new List<JsonData>()
-                                };
-
-                                infos.Push(new RapidParseStackInfo());
-                            }
-                            else if (source[offset] == '"')
-                            {
-                                info.ParseType = (int)RapidParseType.String;
-                                info.ParseInfo = new RapidStringParseInfo()
-                                {
-                                    Escape = false,
-                                    String = new StringBuilder()
-                                };
-                            }
-                            else if (IsNumberStartChar(source[offset]))
-                            {
-                                RapidNumberParseInfo newInfo = new RapidNumberParseInfo()
-                                {
-                                    Number = new StringBuilder()
-                                };
-
-                                info.ParseType = (int)RapidParseType.Number;
-                                info.ParseInfo = newInfo;
-
-                                newInfo.Number.Append(source[offset]);
-                            }
-                            else if (IsWordParseChar(source[offset]))
-                            {
-                                RapidWordParseInfo newInfo = new RapidWordParseInfo()
-                                {
-                                    Word = new StringBuilder()
-                                };
-
-                                info.ParseType = (int)RapidParseType.Word;
-                                info.ParseInfo = newInfo;
-
-                                newInfo.Word.Append(source[offset]);
-                            }
-                            else if (source[offset] == '}' || source[offset] == ']')
-                            {
-                                offset--;
-
-                                popData = null;
-                                infos.Pop();
-                            }
-                            else
-                            {
-                                throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
-                            }
-                        }
-                        break;
-                    case (int)RapidParseType.Object:
-                        {
-                            RapidObjectParseInfo parseInfo = info.ParseInfo as RapidObjectParseInfo;
-
-                            if (IsEmptyChar(source[offset]))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                if (source[offset] == '}')
-                                {
-                                    JsonData thisJsonObject = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Object,
-                                        content = parseInfo.Object
-                                    };
-
-                                    popData = thisJsonObject;
-
-                                    infos.Pop();
-                                }
-                                else
-                                {
-                                    switch (info.ParseState)
-                                    {
-                                        case (int)RapidObjectParseState.KeyAssignment:
-                                            if (source[offset] == ':')
-                                            {
-                                                parseInfo.TempKey = popData;
-                                                info.ParseState = (int)RapidObjectParseState.ValueAssignment;
-
-                                                infos.Push(new RapidParseStackInfo());
-                                            }
-                                            else
-                                            {
-                                                throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
-                                            }
-                                            break;
-                                        case (int)RapidObjectParseState.ValueAssignment:
-                                            if (source[offset] == ',')
-                                            {
-                                                parseInfo.Object[parseInfo.TempKey] = popData;
-                                                info.ParseState = (int)RapidObjectParseState.KeyAssignment;
-
-                                                infos.Push(new RapidParseStackInfo());
-                                            }
-                                            else
-                                            {
-                                                throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
-                                            }
-                                            break;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    case (int)RapidParseType.Array:
-                        {
-                            RapidArrayParseInfo parseInfo = info.ParseInfo as RapidArrayParseInfo;
-
-                            if (IsEmptyChar(source[offset]))
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                if (popData != null)
-                                    parseInfo.Array.Add(popData);
-
-                                if (source[offset] == ']')
-                                {
-                                    JsonData thisJsonArray = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Object,
-                                        content = parseInfo.Array
-                                    };
-
-                                    popData = thisJsonArray;
-
-                                    infos.Pop();
-                                }
-                                else
-                                {
-                                    if (source[offset] == ',')
-                                    {
-                                        infos.Push(new RapidParseStackInfo());
-                                    }
-                                    else
-                                    {
-                                        throw new InvalidCharParseException(string.Format("非法字符'{0}'", source[offset]), offset);
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    case (int)RapidParseType.String:
-                        {
-                            RapidStringParseInfo parseInfo = info.ParseInfo as RapidStringParseInfo;
-
-                            if (parseInfo.Escape)
-                            {
-                                switch(source[offset])
-                                {
-                                    case 'a':
-                                        parseInfo.String.Append('\a');
-                                        break;
-                                    case 'b':
-                                        parseInfo.String.Append('\b');
-                                        break;
-                                    case 'f':
-                                        parseInfo.String.Append('\f');
-                                        break;
-                                    case 'n':
-                                        parseInfo.String.Append('\n');
-                                        break;
-                                    case 'r':
-                                        parseInfo.String.Append('\r');
-                                        break;
-                                    case 't':
-                                        parseInfo.String.Append('\t');
-                                        break;
-                                    case 'v':
-                                        parseInfo.String.Append('\v');
-                                        break;
-                                    default:
-                                        parseInfo.String.Append(source[offset]);
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                if (source[offset] == '"')
-                                {
-                                    JsonData thisJsonString = new JsonData()
-                                    {
-                                        dataType = JsonDataType.String,
-                                        content = parseInfo.String.ToString()
-                                    };
-
-                                    popData = thisJsonString;
-
-                                    infos.Pop();
-                                }
-                                else if (source[offset] == '\\')
-                                {
-                                    parseInfo.Escape = true;
-                                }
-                                else
-                                {
-                                    parseInfo.String.Append(source[offset]);
-                                }
-                            }
-                            break;
-                        }
-                    case (int)RapidParseType.Word:
-                        {
-                            RapidWordParseInfo parseInfo = info.ParseInfo as RapidWordParseInfo;
-
-                            if (IsWordParseChar(source[offset]))
-                            {
-                                parseInfo.Word.Append(source[offset]);
-                            }
-                            else
-                            {
-                                string wordCntnt = parseInfo.Word.ToString();
-                                JsonData thisJsonWord;
-
-                                if (wordCntnt == "true")
-                                    thisJsonWord = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Boolean,
-                                        content = true
-                                    };
-                                else if (wordCntnt == "false")
-                                    thisJsonWord = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Boolean,
-                                        content = false
-                                    };
-                                else if (wordCntnt == "null")
-                                    thisJsonWord = JsonData.CreateNull();
-                                else
-                                    throw new JsonDataTypeException(string.Format("未知的关键词'{0}'", wordCntnt));
-
-                                popData = thisJsonWord;
-
-                                offset--;
-                                infos.Pop();
-                            }
-                            break;
-                        }
-                    case (int)RapidParseType.Number:
-                        {
-                            RapidNumberParseInfo parseInfo = info.ParseInfo as RapidNumberParseInfo;
-
-                            if (IsNumberParsingChar(source[offset]))
-                            {
-                                parseInfo.Number.Append(source[offset]);
-                            }
-                            else
-                            {
-                                string numCntnt = parseInfo.Number.ToString();
-                                JsonData thisJsonNumber;
-
-                                double doubleValue = double.Parse(numCntnt);
-                                int intValue = (int)doubleValue;
-                                float floatValue = (float)doubleValue;
-
-                                if (doubleValue == intValue)
-                                    thisJsonNumber = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Integer,
-                                        content = intValue
-                                    };
-                                else if (doubleValue == floatValue)
-                                    thisJsonNumber = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Float,
-                                        content = floatValue
-                                    };
-                                else
-                                    thisJsonNumber = new JsonData()
-                                    {
-                                        dataType = JsonDataType.Double,
-                                        content = doubleValue
-                                    };
-
-                                popData = thisJsonNumber;
-
-                                offset--;
-                                infos.Pop();
-                            }
-                            break;
-                        }
-                }
-            }
-
-            if (infos.Count > 0)
-            {
-                RapidParseStackInfo info = infos.Peek();
-
-                switch(info.ParseType)
-                {
-                    case (int)RapidParseType.Word:
-                        {
-                            RapidWordParseInfo parseInfo = info.ParseInfo as RapidWordParseInfo;
-
-                            string wordCntnt = parseInfo.Word.ToString();
-                            JsonData thisJsonWord;
-
-                            if (wordCntnt == "true")
-                                thisJsonWord = new JsonData()
-                                {
-                                    dataType = JsonDataType.Boolean,
-                                    content = true
-                                };
-                            else if (wordCntnt == "false")
-                                thisJsonWord = new JsonData()
-                                {
-                                    dataType = JsonDataType.Boolean,
-                                    content = false
-                                };
-                            else if (wordCntnt == "null")
-                                thisJsonWord = JsonData.CreateNull();
-                            else
-                                throw new JsonDataTypeException(string.Format("未知的关键词'{0}'", wordCntnt));
-
-                            popData = thisJsonWord;
-
-                            infos.Pop();
-                        }
-                        break;
-                    case (int)RapidParseType.Number:
-                        {
-                            RapidNumberParseInfo parseInfo = info.ParseInfo as RapidNumberParseInfo;
-
-                            string numCntnt = parseInfo.Number.ToString();
-                            JsonData thisJsonNumber;
-
-                            double doubleValue = double.Parse(numCntnt);
-                            int intValue = (int)doubleValue;
-                            float floatValue = (float)doubleValue;
-
-                            if (doubleValue == intValue)
-                                thisJsonNumber = new JsonData()
-                                {
-                                    dataType = JsonDataType.Integer,
-                                    content = intValue
-                                };
-                            else if (doubleValue == floatValue)
-                                thisJsonNumber = new JsonData()
-                                {
-                                    dataType = JsonDataType.Float,
-                                    content = floatValue
-                                };
-                            else
-                                thisJsonNumber = new JsonData()
-                                {
-                                    dataType = JsonDataType.Double,
-                                    content = doubleValue
-                                };
-
-                            popData = thisJsonNumber;
-
-                            infos.Pop();
-                        }
-                        break;
-                    default:
-                        throw new NotClosedParseException("未能从中分析出数据", offset);
-                }
-            }
-
-            return popData;
-        }
-        public static JsonData RapidParse(char[] jsonText)
-        {
-            char[] source = jsonText;
-            int offset = 0;
-
-            JsonData result = RapidParseData(ref source, ref offset);
-
-            for (offset++; offset < source.Length; offset++)
-            {
-                if (!IsEmptyChar(source[offset]))
-                {
-                    throw new JsonFormatParseException("一个Json文本中不能出现两个元素并列的情况", offset);
-                }
-            }
-
-            return result;
-        }
-        public static JsonData RapidParse(string jsonText)
-        {
-            char[] source = jsonText.ToCharArray();
-            int offset = 0;
-
-            JsonData result = RapidParseData(ref source, ref offset);
-
-            for (offset++; offset < source.Length; offset++)
-            {
-                if (!IsEmptyChar(source[offset]))
-                {
-                    throw new JsonFormatParseException("一个Json文本中不能出现两个元素并列的情况", offset);
-                }
-            }
-
-            return result;
-        }
-        public static JsonData[] ParseStream(char[] jsonText)
-        {
-            char[] source = jsonText;
-            int offset = 0;
-
-            List<JsonData> result = new List<JsonData>();
-
             for (; offset < source.Length; offset++)
             {
-                JsonData currentJson = JsonData.ParseData(ref source, ref offset);
-                result.Add(currentJson);
+                if (!EmptyChars.Contains(source[offset]))
+                {
+                    throw new JsonFormatParseException("一个Json文本中不能出现两个元素并列的情况");
+                }
             }
 
-            return result.ToArray();
-        }
-        public static JsonData[] ParseStream(string jsonText)
-        {
-            char[] source = jsonText.ToCharArray();
-            int offset = 0;
-
-            List<JsonData> result = new List<JsonData>();
-
-            for (; offset < source.Length; offset++)
-            {
-                JsonData currentJson = JsonData.ParseData(ref source, ref offset);
-                result.Add(currentJson);
-            }
-
-            return result.ToArray();
-        }
-        /// <summary>
-        /// 尝试从包含Json文本的字符数组中分析Json数据
-        /// </summary>
-        /// <param name="jsonText">包含Json数据的文本</param>
-        /// <param name="jsonObj">返回的结果</param>
-        /// <returns>是否分析成功</returns>
-        public static bool TryParse(char[] jsonText, out JsonData jsonObj)
-        {
-            try
-            {
-                jsonObj = Parse(jsonText);
-                return true;
-            }
-            catch
-            {
-                jsonObj = null;
-                return false;
-            }
+            return result;
         }
         /// <summary>
         /// 尝试从Json文本中分析Json数据
@@ -1900,32 +1278,6 @@ namespace CHO.Json
             catch
             {
                 jsonObj = null;
-                return false;
-            }
-        }
-        public static bool TryParseStream(char[] jsonText, out JsonData[] jsonObjs)
-        {
-            try
-            {
-                jsonObjs = ParseStream(jsonText);
-                return true;
-            }
-            catch
-            {
-                jsonObjs = null;
-                return false;
-            }
-        }
-        public static bool TryParseStream(string jsonText, out JsonData[] jsonObjs)
-        {
-            try
-            {
-                jsonObjs = ParseStream(jsonText);
-                return true;
-            }
-            catch
-            {
-                jsonObjs = null;
                 return false;
             }
         }
@@ -2039,9 +1391,5 @@ namespace CHO.Json
             }
             return content.GetHashCode();
         }
-    }
-    public class JsonDataParser
-    {
-
     }
 }
