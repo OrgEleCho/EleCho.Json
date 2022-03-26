@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using EleCho.Json;
+using Newtonsoft.Json.Linq;
 
 namespace TestConsole
 {
@@ -36,9 +37,37 @@ namespace TestConsole
                 }
             }));
 
-            JsonObject jobj = new JsonObject();
-            string someV = jobj["some_key"] as JsonString;
-            
+            Stopwatch stopwatch = new Stopwatch();
+
+            Console.Write("\n\n\n\n\n");
+            Console.WriteLine("SpeedTest:");
+
+            stopwatch.Start();
+            for (int i = 0; i < 1000; i++)
+            {
+                _ = JsonSerializer.Deserialize(jsonToRead);
+            }
+            stopwatch.Stop();
+            Console.WriteLine("EleCho.Json > JsonSerializer.Deserialize: " + stopwatch.ElapsedMilliseconds + "ms");
+
+            stopwatch.Reset();
+            stopwatch.Start();
+            for (int i = 0; i < 1000; i++)
+            {
+                _ = System.Text.Json.JsonDocument.Parse(jsonToRead);
+            }
+            stopwatch.Stop();
+            Console.WriteLine("System.Text.Json > JsonDocument.Parse: " + stopwatch.ElapsedMilliseconds + "ms");
+
+            stopwatch.Reset();
+            stopwatch.Start();
+            for (int i = 0; i < 1000; i++)
+            {
+                _ = JObject.Parse(jsonToRead);
+            }
+            stopwatch.Stop();
+            Console.WriteLine("Newtonsoft.Json > JObject.Parse: " + stopwatch.ElapsedMilliseconds + "ms");
+
             Console.ReadLine();
         }
     }

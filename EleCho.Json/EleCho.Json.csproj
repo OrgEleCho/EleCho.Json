@@ -3,7 +3,17 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;net46;net47;net48;net5.0;net6.0</TargetFrameworks>
 	  <LangVersion>latest</LangVersion>	  
-    <Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>	  
+    <Description>Easy, Simple, Fast JSON reader and writer.</Description>	  
+    <PackageReadmeFile>readme.md</PackageReadmeFile>	  
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
