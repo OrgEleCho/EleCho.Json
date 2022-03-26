@@ -36,6 +36,9 @@ namespace TestConsole
                 }
             }));
 
+            JsonObject jobj = new JsonObject();
+            string someV = jobj["some_key"] as JsonString;
+            
             Console.ReadLine();
         }
     }

@@ -23,13 +23,22 @@ namespace EleCho.Json
             return jr.Read();
         }
 
+        public static object? Deserialize(string json, Type type)
+        {
+            StringReader sr = new StringReader(json);
+            JsonReader jr = new JsonReader(sr);
+            IJsonData jsonData = jr.Read();
+
+            return JsonData.ToValue(type, jsonData);
+        }
+
         public static T? Deserialize<T>(string json) where T : class
         {
             StringReader sr = new StringReader(json);
             JsonReader jr = new JsonReader(sr);
             IJsonData jsonData = jr.Read();
 
-            return JsonData.LoadToModel(typeof(T), jsonData) as T;
+            return JsonData.ToValue(typeof(T), jsonData) as T;
         }
     }
 }
