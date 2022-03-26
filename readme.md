@@ -1,12 +1,10 @@
 # EleCho.Json
 
-<div align=center>
-
-    <img alt="Nuget" src="https://img.shields.io/nuget/v/EleCho.Json"/>
-    <img alt="Nuget" src="https://img.shields.io/nuget/dt/EleCho.Json"/>
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/SlimeNull/Elecho.Json">
-    <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/SlimeNull/EleCho.Json">
-
+<div align="center">
+<img alt="Nuget" src="https://img.shields.io/nuget/v/EleCho.Json"/>
+<img alt="Nuget" src="https://img.shields.io/nuget/dt/EleCho.Json"/>
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/SlimeNull/Elecho.Json">
+<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/SlimeNull/EleCho.Json">
 </div>
 
 Easy, Simple and Fast JSON reader and writer. You can also use model class to operate JSON data.
