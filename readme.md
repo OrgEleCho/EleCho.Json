@@ -2,7 +2,6 @@
 
 ![nuget](https://img.shields.io/nuget/v/EleCho.Json) ![nuget](https://img.shields.io/nuget/dt/EleCho.Json) ![github last commit](https://img.shields.io/github/last-commit/SlimeNull/Elecho.Json) ![gitHub code size in bytes](https://img.shields.io/github/languages/code-size/SlimeNull/EleCho.Json)
 
-
 Easy, Simple and Fast JSON reader and writer. You can also use model class to operate JSON data.
 便捷, 简单以及高速的 JSON 读写器. 同时以也可以使用实体类来操作 JSON 数据.
 
@@ -17,6 +16,7 @@ The document is available in English and Chinese, just scroll down.
 This library is primarily for simple JSON operations that are fast and don't require complex features, such as primitive type conversions.
 
 Various JSON object stores
+
 ```csharp
 JsonObject jObj = new JsonObject();    // JSON Object (Key-value pair storage)
 jObj.Add("some_key", "any_value");     // Set value with string key
@@ -36,6 +36,7 @@ int someNum = jObj["some_key_num"] as JsonNumber;  // Read JSON number from JSON
 ```
 
 Write JSON data to stream
+
 ```csharp
 Stream stream;  // 要写入的 Stream
 IJsonData someJsonData;
@@ -44,6 +45,7 @@ jw.Write(someJsonData);
 ```
 
 Read JSON data from stream
+
 ```csharp
 Stream stream;  // 要读取的 Stream
 JsonReader jr = new JsonReader(stream);   // 实例化 JSON 读取器
@@ -51,6 +53,7 @@ IJsonData jsonData = jr.Read();           // 从流中读取一个完整的 JSON
 ```
 
 Create JSON data with any object
+
 ```csharp
 IJsonData jsonData = JsonData.FromValue(new()
 {
@@ -61,13 +64,14 @@ IJsonData jsonData = JsonData.FromValue(new()
 ```
 
 Create model object with JSON data
+
 ```csharp
 class One
 {
     public string Name;
     public int Age;
     public string Description;
-    
+
     // you can also use Property here
 }
 
@@ -79,6 +83,7 @@ void LogicalCode()
 ```
 
 Serialize model object to JSON string
+
 ```csharp
 class One
 {
@@ -95,6 +100,7 @@ void LogicalCode()
 ```
 
 Deserialize from JSON string
+
 ```csharp
 class One
 {
@@ -111,11 +117,12 @@ void LogicalCode()
 ```
 
 Parse JSON tokens from stream
+
 ```csharp
 Stream stream;     // Stream to read
-JsonParser jParser = new JsonParser(stream);
-jParser.PeekToken();   // peek a token from the stream
-jParser.ReadToken();   // read a token from the stream
+JsonLexer jLexer = new JsonLexer(stream);
+jLexer.PeekToken();   // peek a token from the stream
+jLexer.ReadToken();   // read a token from the stream
 ```
 
 ## 简体中文
@@ -123,6 +130,7 @@ jParser.ReadToken();   // read a token from the stream
 这个库主要是追求较高速率的, 不要求复杂特性的简易 JSON 操作, 例如最基本类型的转换.
 
 各种 JSON 对象存储
+
 ```csharp
 JsonObject jObj = new JsonObject();    // JSON 对象 (键值对存储)
 jObj.Add("some_key", "any_value");     // 使用字符串键设置值
@@ -143,6 +151,7 @@ int someNum = jObj["some_key_num"] as JsonNumber;  // 从 JSON 对象中读取 J
 ```
 
 将 JSON 数据写入到流
+
 ```csharp
 Stream stream;  // 要写入的 Stream
 IJsonData someJsonData;
@@ -151,6 +160,7 @@ jw.Write(someJsonData);
 ```
 
 从流中读取 IJsonData:
+
 ```csharp
 Stream stream;  // 要读取的 Stream
 JsonReader jr = new JsonReader(stream);   // 实例化 JSON 读取器
@@ -158,6 +168,7 @@ IJsonData jsonData = jr.Read();           // 从流中读取一个完整的 JSON
 ```
 
 从任意创建 JSON 数据
+
 ```csharp
 IJsonData jsonData = JsonData.FromValue(new()
 {
@@ -168,13 +179,14 @@ IJsonData jsonData = JsonData.FromValue(new()
 ```
 
 从 JSON 数据创建模型对象
+
 ```csharp
 class One
 {
     public string Name;
     public int Age;
     public string Description;
-    
+
     // 在这里你也可以使用属性
 }
 
@@ -186,6 +198,7 @@ void LogicalCode()
 ```
 
 将对象序列化为 JSON 字符串
+
 ```csharp
 class One
 {
@@ -202,6 +215,7 @@ void LogicalCode()
 ```
 
 从 JSON 字符串反序列化
+
 ```csharp
 class One
 {
@@ -218,9 +232,10 @@ void LogicalCode()
 ```
 
 从流中解析 JSON token
+
 ```csharp
 Stream stream;     // 要读取的流
-JsonParser jParser = new JsonParser(stream);
-jParser.PeekToken();   // 从流中读取一个 token, 但不变更当前的读取状态
-jParser.ReadToken();   // 从流中读取一个 token, 并移动到下一个 token
+JsonLexer jLexer = new JsonLexer(stream);
+jLexer.PeekToken();   // 从流中读取一个 token, 但不变更当前的读取状态
+jLexer.ReadToken();   // 从流中读取一个 token, 并移动到下一个 token
 ```
