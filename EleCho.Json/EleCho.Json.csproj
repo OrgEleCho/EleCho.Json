@@ -9,9 +9,14 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <Version>1.0.1</Version>
+	  <PackageIcon>logo-128x128.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\logo-128x128.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\readme.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

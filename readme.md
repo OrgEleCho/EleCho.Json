@@ -1,11 +1,7 @@
 # EleCho.Json
 
-<div align="center">
-<img alt="Nuget" src="https://img.shields.io/nuget/v/EleCho.Json"/>
-<img alt="Nuget" src="https://img.shields.io/nuget/dt/EleCho.Json"/>
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/SlimeNull/Elecho.Json">
-<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/SlimeNull/EleCho.Json">
-</div>
+![nuget](https://img.shields.io/nuget/v/EleCho.Json) ![nuget](https://img.shields.io/nuget/dt/EleCho.Json) ![github last commit](https://img.shields.io/github/last-commit/SlimeNull/Elecho.Json) ![gitHub code size in bytes](https://img.shields.io/github/languages/code-size/SlimeNull/EleCho.Json)
+
 
 Easy, Simple and Fast JSON reader and writer. You can also use model class to operate JSON data.
 便捷, 简单以及高速的 JSON 读写器. 同时以也可以使用实体类来操作 JSON 数据.
