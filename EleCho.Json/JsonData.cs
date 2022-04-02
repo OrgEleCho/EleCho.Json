@@ -6,23 +6,26 @@ using System.Reflection;
 
 namespace EleCho.Json
 {
+    /// <summary>
+    /// Provide static methods to convert between special .NET types and JSON types.
+    /// 提供静态方法，将特定的 .NET 类型转换为 JSON 类型。
+    /// </summary>
     public static class JsonData
     {
-
-        public static IJsonData FromValue(object value)
+        /// <summary>
+        /// Convert a special .NET type to a JSON type.
+        /// 将特定的 .NET 类型转换为 JSON 类型。
+        /// </summary>
+        /// <param name="value">Any basic number, boolean, dictionary, list, or other model object. <br/>任意基础数字, 布尔值, 字典, 列表, 或者其他实体对象.</param>
+        /// <returns></returns>
+        public static IJsonData FromValue(object? value)
         {
             return value switch
             {
                 null => Null,
-                bool b => new JsonBoolean(b),
-                byte b => new JsonNumber(b),
-                int i => new JsonNumber(i),
-                short s => new JsonNumber(s),
-                long l => new JsonNumber(l),
-                float f => new JsonNumber(f),
-                double d => new JsonNumber(d),
-                string str => new JsonString(str),
+                bool b => (JsonBoolean)b,
 
+                IConvertible n => new JsonNumber(n.ToDouble(null)),
                 IList list => FromArrayValue(list),
                 IDictionary dict => FromObjectValue(dict),
 
@@ -31,6 +34,14 @@ namespace EleCho.Json
                 _ => FromModelValue(value),
             };
         }
+
+        /// <summary>
+        /// Convert dictionary to JSON object.
+        /// 将字典转换为 JSON 对象
+        /// </summary>
+        /// <param name="dict">Data to convert. <br/>要转换的数据.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Key is not string</exception>
         public static JsonObject FromObjectValue(IDictionary dict)
         {
             JsonObject dictData = new JsonObject();
@@ -45,6 +56,12 @@ namespace EleCho.Json
 
             return dictData;
         }
+        /// <summary>
+        /// Convert list to JSON array.
+        /// 将列表转换为 JSON 数组
+        /// </summary>
+        /// <param name="list">Data to convert. <br/>要转换的数据.</param>
+        /// <returns></returns>
         public static JsonArray FromArrayValue(IList list)
         {
             JsonArray listData = new JsonArray();
@@ -57,10 +74,10 @@ namespace EleCho.Json
             return listData;
         }
         /// <summary>
-        /// Get JsonData from any model object
+        /// Create JsonData from any model object
         /// </summary>
         /// <typeparam name="TObj">Any class type</typeparam>
-        /// <param name="obj">Model object</param>
+        /// <param name="obj">Model object. <br/>实体对象.</param>
         /// <returns>JsonObject or JsonNull</returns>
         public static IJsonData FromModelValue<TObj>(TObj obj) where TObj : class
         {
@@ -86,8 +103,9 @@ namespace EleCho.Json
 
         /// <summary>
         /// Create Dictionary or model object from JsonObject
+        /// 从 JsonObject 创建字典或者实体对象
         /// </summary>
-        /// <param name="objType">Dictionary<string, T> or any class type</param>
+        /// <param name="objType"><see cref="IDictionary"/> or any class type</param>
         /// <param name="jsonObject">Source data</param>
         /// <returns>Instance with specified type</returns>
         /// <exception cref="ArgumentException"></exception>
@@ -100,7 +118,7 @@ namespace EleCho.Json
             {
                 Type[] genTypes = objType.GetGenericArguments();
                 if (genTypes[0] != typeof(string))
-                    throw new ArgumentException("Model type must be Dictionary<string, T> when it's a IDictionary");
+                    throw new ArgumentException("Model type must be Dictionary<string, T> when it's a IDictionary", nameof(objType));
 
                 Type valueType = genTypes[1];
                 IDictionary dict = (Activator.CreateInstance(objType) as IDictionary)!;
@@ -113,7 +131,7 @@ namespace EleCho.Json
             }
             else
             {
-                model = Activator.CreateInstance(objType);
+                model = Activator.CreateInstance(objType)!;
                 PropertyInfo[] props = objType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 FieldInfo[] fields = objType.GetFields(BindingFlags.Public | BindingFlags.Instance);
 
@@ -320,8 +338,17 @@ namespace EleCho.Json
             return model;
         }
 
-        public static JsonNull Null => new JsonNull();
-        public static JsonBoolean True => new JsonBoolean(true);
-        public static JsonBoolean False => new JsonBoolean(false);
+        /// <summary>
+        /// JSON null
+        /// </summary>
+        public static JsonNull Null => JsonNull.Null;
+        /// <summary>
+        /// JSON boolean, true
+        /// </summary>
+        public static JsonBoolean True => JsonBoolean.True;
+        /// <summary>
+        /// JSON boolean, false
+        /// </summary>
+        public static JsonBoolean False => JsonBoolean.False;
     }
 }

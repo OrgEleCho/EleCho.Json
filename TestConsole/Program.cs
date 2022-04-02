@@ -24,7 +24,7 @@ namespace TestConsole
             IJsonData jsonData = reader.Read();
             StringWriter sr = new StringWriter();
             JsonWriter writer = new JsonWriter(sr);
-            writer.WriteData(jsonData);
+            writer.Write(jsonData);
             Console.WriteLine(sr.ToString());
             Console.WriteLine(JsonSerializer.Serialize(new
             {

@@ -7,6 +7,8 @@
     <Description>Easy, Simple, Fast JSON reader and writer.</Description>	  
     <PackageReadmeFile>readme.md</PackageReadmeFile>	  
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,17 +4,31 @@ using System.Text;
 
 namespace EleCho.Json
 {
-    public class JsonParser
+    /// <summary>
+    /// JSON lexer, JSON tokens are produced by the lexer. <br/>
+    /// JSON 此法分析器, JSON 单词由词法分析器产生。
+    /// </summary>
+    public class JsonLexer
     {
         private readonly TextReader reader;
         private JsonToken current = JsonToken.None;
 
-        public JsonParser(Stream source)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonLexer"/> class. <br/>
+        /// 初始化 <see cref="JsonLexer"/> 类的新实例。
+        /// </summary>
+        /// <param name="source"><see cref="Stream"/> to read.  <br/>要读取的 <see cref="Stream"/></param>
+        public JsonLexer(Stream source)
         {
             reader = new StreamReader(source);
         }
-        
-        public JsonParser(TextReader reader)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonLexer"/> class. <br/>
+        /// 初始化 <see cref="JsonLexer"/> 类的新实例。
+        /// </summary>
+        /// <param name="reader"><see cref="TextReader"/> to use.  <br/>要使用的 <see cref="TextReader"/></param>
+        public JsonLexer(TextReader reader)
         {
             this.reader = reader;
         }
@@ -27,7 +41,7 @@ namespace EleCho.Json
         internal string ReadString()
         {
             int cur;
-            cur = reader.Read();   // skip the first '"'
+            cur = reader.Read();   // skip the first '"' 跳过第一个双引号
 
             bool escape = false;
             StringBuilder sb = new StringBuilder();
@@ -58,7 +72,7 @@ namespace EleCho.Json
                     }
                     else if (cur == '"')
                     {
-                        // " is already readed, so we need to read the next char
+                        // " is already readed, so we need to read the next char, 双引号已经被读取了, 所以我们不需要读取下一个字符
                         return sb.ToString();
                     }
                     else
@@ -78,14 +92,14 @@ namespace EleCho.Json
 
             StringBuilder sb = new StringBuilder();
             sb.Append((char)cur);
-            reader.Read();  // skip the first char
+            reader.Read();  // skip the first char. 跳过第一个字符
 
             while (cur != -1)
             {
                 cur = reader.Peek();
                 if (cur >= '0' && cur <= '9')
                 {
-                    reader.Read();   // skip the char
+                    reader.Read();   // skip the char. 跳过字符
                     sb.Append((char)cur);
                 }
                 else
@@ -102,7 +116,7 @@ namespace EleCho.Json
                     reader.Peek();
                     if (cur >= '0' && cur <= '9')
                     {
-                        reader.Read();   // skip the char
+                        reader.Read();   // skip the char. 跳过字符
                         sb.Append((char)cur);
                     }
                     else
@@ -119,7 +133,7 @@ namespace EleCho.Json
                 cur = reader.Peek();
                 if (cur == '+' || cur == '-')
                 {
-                    reader.Read();   // skip the first '+' or '-'
+                    reader.Read();   // skip the first '+' or '-'. 跳过第一个'+'或'-'
                     sb.Append((char)cur);
                 }
 
@@ -128,7 +142,7 @@ namespace EleCho.Json
                     reader.Peek();
                     if (cur >= '0' && cur <= '9')
                     {
-                        reader.Read();   // skip the char
+                        reader.Read();   // skip the char. 跳过字符
                         sb.Append((char)cur);
                     }
                     else
@@ -159,7 +173,7 @@ namespace EleCho.Json
             int cur;
             while (true)
             {
-                cur = reader.Peek();  // skip the whitespace
+                cur = reader.Peek();  // skip the whitespace. 跳过空白
                 if (char.IsWhiteSpace((char)cur))
                 {
                     reader.Read();
@@ -173,6 +187,13 @@ namespace EleCho.Json
             return cur;
         }
 
+        /// <summary>
+        /// Reads the next token without changing the state of the lexer.
+        /// Returns the next available token and cache the token. (Calling <see cref="ReadToken"/> will fist use the cache) <br/>
+        /// 读取下一个令牌, 但不改变词法分析器的状态。
+        /// 返回下一个可用的令牌, 并缓存该令牌。(调用 <see cref="ReadToken"/> 将优先使用缓存)
+        /// </summary>
+        /// <returns></returns>
         public JsonToken PeekToken()
         {
             if (current.IsNone())
@@ -182,6 +203,13 @@ namespace EleCho.Json
 
             return current;
         }
+
+        /// <summary>
+        /// Reads the next token from the lexer. (If <see cref="PeekToken"/> was called before read, cache token will be first use) <br/>
+        /// 从词法分析器读取下一个令牌。(如果 <see cref="PeekToken"/> 在读取之前被调用，缓存令牌将首先使用)
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public JsonToken ReadToken()
         {
             if (!current.IsNone())
@@ -195,7 +223,7 @@ namespace EleCho.Json
             if (curChar == -1)
                 return new JsonToken(JsonTokenKind.None, string.Empty);
             if (char.IsWhiteSpace((char)curChar))
-                curChar = SkipEmpty();          // skip the whitespace
+                curChar = SkipEmpty();          // skip the whitespace. 跳过空白
 
             return curChar switch
             {
