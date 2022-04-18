@@ -21,7 +21,7 @@ namespace EleCho.Json
         /// Creates a new instance of the <see cref="JsonObject"/> class.
         /// </summary>
         /// <param name="data"></param>
-        public JsonObject(Dictionary<string, IJsonData> data)
+        public JsonObject(IEnumerable<KeyValuePair<string, IJsonData>> data)
         {
             foreach (var item in data)
                 Add(item.Key, item.Value);

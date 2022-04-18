@@ -15,6 +15,20 @@ namespace EleCho.Json
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
+        public static string Serialize(IJsonData value)
+        {
+            StringWriter sw = new StringWriter();
+            JsonWriter jw = new JsonWriter(sw);
+            jw.Write(value);
+
+            return sw.ToString();
+        }
+
+        /// <summary>
+        /// Serialize any object to JSON document string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string Serialize(object value)
         {
             StringWriter sw = new StringWriter();
@@ -64,6 +78,32 @@ namespace EleCho.Json
             IJsonData jsonData = jr.Read();
 
             return JsonData.ToValue(typeof(T), jsonData) as T;
+        }
+
+        /// <summary>
+        /// Populate object from JSON document string
+        /// </summary>
+        /// <param name="json">JSON object data or array data</param>
+        /// <param name="target">Target instance</param>
+        /// <exception cref="ArgumentException"></exception>
+        public static void Populate(string json, object target)
+        {
+            StringReader sr = new StringReader(json);
+            JsonReader jr = new JsonReader(sr);
+            IJsonData jsonData = jr.Read();
+
+            if (jsonData is JsonObject jsonObject)
+            {
+                JsonData.PopulateObject(target, jsonObject);
+            }
+            else if (jsonData is JsonArray jsonArray)
+            {
+                JsonData.PopulateArray(target, jsonArray);
+            }
+            else
+            {
+                throw new ArgumentException("JSON data is not an object or array");
+            }
         }
     }
 }

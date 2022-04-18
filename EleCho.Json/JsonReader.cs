@@ -34,6 +34,45 @@ namespace EleCho.Json
             lexer = new JsonLexer(reader);
         }
 
+        /// <summary>
+        /// Create a new instance of the <see cref="JsonReader"/> class.
+        /// </summary>
+        /// <param name="json">JSON text</param>
+        public JsonReader(string json)
+        {
+            lexer = new JsonLexer(new StringReader(json));
+        }
+
+        /// <summary>
+        /// Create a new <see cref="JsonReader"/> and use it to read a <see cref="IJsonData"/> from the stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static IJsonData Read(Stream stream)
+        {
+            return new JsonReader(stream).Read();
+        }
+
+        /// <summary>
+        /// Create a new <see cref="JsonReader"/> and use it to read a <see cref="IJsonData"/> from the TextReader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static IJsonData Read(TextReader reader)
+        {
+            return new JsonReader(reader).Read();
+        }
+
+        /// <summary>
+        /// Create a new <see cref="JsonReader"/> and use it to read a <see cref="IJsonData"/> from the string.
+        /// </summary>
+        /// <param name="json">JSON text</param>
+        /// <returns></returns>
+        public static IJsonData Read(string json)
+        {
+            return new JsonReader(json).Read();
+        }
+
         internal JsonObject InternalReadObject()
         {
             Dictionary<string, IJsonData> dataDict = new ();

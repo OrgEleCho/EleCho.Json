@@ -5,9 +5,6 @@
 Easy, Simple and Fast JSON reader and writer. You can also use model class to operate JSON data.
 便捷, 简单以及高速的 JSON 读写器. 同时以也可以使用实体类来操作 JSON 数据.
 
-It is about 1.89 times faster than Newtonsoft.Json and 7.92 times faster than System.Text.Json, You can also run the test yourself in the TestConsole project
-速度约为 Newtonsoft.Json 的 1.89 倍, System.Text.Json 的 7.92 倍, 你也可以在 TestConsole 项目中自己运行该测试
-
 The document is available in English and Chinese, just scroll down.
 文档有英文和中文, 往下翻阅即可.
 

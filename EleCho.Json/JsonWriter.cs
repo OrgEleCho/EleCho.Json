@@ -37,6 +37,26 @@ namespace EleCho.Json
         }
 
         /// <summary>
+        /// Create a new <see cref="JsonWriter"/> and use it to write a <see cref="IJsonData"/>
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="json"></param>
+        public static void Write(Stream stream, IJsonData json)
+        {
+            new JsonWriter(stream).Write(json);
+        }
+
+        /// <summary>
+        /// Create a new <see cref="JsonWriter"/> and use it to write a <see cref="IJsonData"/>
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="json"></param>
+        public static void Write(TextWriter writer, IJsonData json)
+        {
+            new JsonWriter(writer).Write(json);
+        }
+
+        /// <summary>
         /// Write the JSON object to the underlying <see cref="TextWriter"/>.
         /// </summary>
         /// <param name="data"></param>

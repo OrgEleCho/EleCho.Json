@@ -9,9 +9,8 @@
         /// Value is <see cref="JsonDataKind.Null"/>
         /// </summary>
         public JsonDataKind DataKind => JsonDataKind.Null;
-        private JsonNull()
-        {
-        }
+
+        private JsonNull() { }
 
         /// <summary>
         /// Get an null object
@@ -25,5 +24,10 @@
         /// JSON null value
         /// </summary>
         public static JsonNull Null => @null;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => 0;
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => obj is JsonNull;
     }
 }

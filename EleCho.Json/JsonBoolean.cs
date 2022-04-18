@@ -1,4 +1,6 @@
-﻿namespace EleCho.Json
+﻿using System;
+
+namespace EleCho.Json
 {
     /// <summary>
     /// Represents a JSON boolean. true or false.
@@ -47,5 +49,11 @@
         /// </summary>
         /// <param name="data"></param>
         public static implicit operator JsonBoolean(bool data) => data ? trueInstance : falseInstance;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => Tuple.Create(nameof(JsonBoolean), Value).GetHashCode();
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => obj is JsonBoolean data && data.Value == Value;
     }
 }

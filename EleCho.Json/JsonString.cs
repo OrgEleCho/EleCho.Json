@@ -1,14 +1,16 @@
-﻿namespace EleCho.Json
+﻿using System;
+
+namespace EleCho.Json
 {
     /// <summary>
     /// JSON string
     /// </summary>
-    public class JsonString : IJsonData
+    public class JsonString : IJsonData, ICloneable
     {
         /// <summary>
         /// Value of the JSON data
         /// </summary>
-        public string Value { get; }
+        public readonly string Value;
         /// <summary>
         /// Value is <see cref="JsonDataKind.String"/>
         /// </summary>
@@ -36,5 +38,23 @@
         /// </summary>
         /// <param name="data"></param>
         public static implicit operator JsonString(string data) => new JsonString(data);
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return Tuple.Create(nameof(JsonString), Value).GetHashCode();
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj)
+        {
+            base.Equals(obj);
+            return obj is JsonString data &&
+                   Value == data.Value;
+        }
+
+
+        /// <inheritdoc/>
+        public object Clone() => new JsonString(Value);
     }
 }

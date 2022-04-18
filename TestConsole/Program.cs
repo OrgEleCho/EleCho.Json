@@ -37,6 +37,36 @@ namespace TestConsole
                 }
             }));
 
+            JsonAny jAny = new JsonObject{ };
+            jAny["a"] = new JsonObject();
+            jAny["a"]["b"] = new JsonObject();
+            jAny["a"]["b"]["c"] = "Some text";
+
+            jAny["d"] = "QWQ";
+
+            jAny["b"] = new JsonObject()
+            {
+                { "c", "Some text" },
+                { "q", true },
+                { "a", 123 },
+            };
+
+            var qwq = JsonSerializer.Serialize(jAny.Value);
+
+            foreach (object item in new JsonAny(new JsonArray()
+            {
+                "qwoeiqj",
+                1231,
+                "faowiefj"
+            }).AsArray())
+            {
+                Console.WriteLine(item);
+            }
+
+            JArray jarr = new JArray();
+            jarr.Insert(0, "qwq");
+            Console.WriteLine(jarr.Contains("qwq"));
+
             Stopwatch stopwatch = new Stopwatch();
 
             Console.Write("\n\n\n\n\n");
@@ -45,7 +75,7 @@ namespace TestConsole
             stopwatch.Start();
             for (int i = 0; i < 1000; i++)
             {
-                _ = JsonSerializer.Deserialize(jsonToRead);
+                _ = new JsonReader(new StringReader(jsonToRead)).Read();
             }
             stopwatch.Stop();
             Console.WriteLine("EleCho.Json > JsonSerializer.Deserialize: " + stopwatch.ElapsedMilliseconds + "ms");

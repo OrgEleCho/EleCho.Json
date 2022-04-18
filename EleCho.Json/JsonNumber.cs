@@ -1,4 +1,6 @@
-﻿namespace EleCho.Json
+﻿using System;
+
+namespace EleCho.Json
 {
     /// <summary>
     /// Represents a JSON number. storage double number
@@ -16,9 +18,9 @@
         public JsonNumber(double data) => Value = data;
 
         /// <summary>
-        /// Get
+        /// Get the double number value of this JSON number.
         /// </summary>
-        public double Value { get; }
+        public readonly double Value;
 
         /// <summary>
         /// Get the double number value of this JSON number.
@@ -38,5 +40,11 @@
         /// </summary>
         /// <param name="value"></param>
         public static implicit operator double(JsonNumber value) => value.Value;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => Tuple.Create(nameof(JsonNumber), Value).GetHashCode();
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => obj is JsonNumber other && Equals(other);
     }
 }
