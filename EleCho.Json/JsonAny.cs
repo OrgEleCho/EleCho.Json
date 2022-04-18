@@ -13,6 +13,13 @@ namespace EleCho.Json
     /// </summary>
     public class JsonAny : IDictionary<string, JsonAny>, IList<JsonAny>
     {
+        private static bool strictMode = true;
+        /// <summary>
+        /// Get or set if exception will be thrown when error
+        /// 获取或设置当错误时是否抛出异常.
+        /// </summary>
+        public static bool StrictMode { get => strictMode; set => strictMode = value; }
+
         /// <summary>
         /// Value of this instance
         /// </summary>
@@ -25,7 +32,11 @@ namespace EleCho.Json
             {
                 if (Value is JsonObject jObj)
                     return jObj.Keys;
-                throw new InvalidOperationException("Not a JsonObject");
+
+                if (strictMode)
+                    throw new InvalidOperationException("Not a JsonObject");
+
+                return Array.Empty<string>();
             }
         }
 
@@ -36,7 +47,11 @@ namespace EleCho.Json
             {
                 if (Value is JsonObject jObj)
                     return new ValueCollection(jObj);
-                throw new InvalidOperationException("Not a JsonObject");
+
+                if (strictMode)
+                    throw new InvalidOperationException("Not a JsonObject");
+
+                return Array.Empty<JsonAny>();
             }
         }
 
@@ -52,7 +67,10 @@ namespace EleCho.Json
                 else if (Value is JsonString jStr)
                     return jStr.Value.Length;
 
-                throw new InvalidOperationException("Not a JsonObject, JsonArray or JsonString");
+                if (strictMode)
+                    throw new InvalidOperationException("Not a JsonObject, JsonArray or JsonString");
+
+                return 0;
             }
         }
 
@@ -71,13 +89,15 @@ namespace EleCho.Json
             {
                 if (Value is JsonArray jArr)
                     return new JsonAny(jArr[index]);
-                throw new InvalidOperationException("Not a JsonArray");
+                if (strictMode)
+                    throw new InvalidOperationException("Not a JsonArray");
+                return JsonNull.Null;
             }
             set
             {
                 if (this.Value is JsonArray jArr)
                     jArr[index] = value.Value;
-                else
+                else if (strictMode)
                     throw new InvalidOperationException("Not a JsonArray");
             }
         }
@@ -94,14 +114,16 @@ namespace EleCho.Json
             {
                 if (Value is JsonObject jObj)
                     return new JsonAny(jObj[key]);
-                throw new InvalidOperationException("Not a JsonObject");
+                if (strictMode)
+                    throw new InvalidOperationException("Not a JsonObject");
+                return JsonNull.Null;
             }
 
             set
             {
-                if (this.Value is JsonObject jObj)
+                if (Value is JsonObject jObj)
                     jObj[key] = value.Value;
-                else
+                else if (strictMode)
                     throw new InvalidOperationException("Not a JsonObject");
             }
         }
@@ -208,7 +230,7 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 jObj.Add(key, value.Value);
-            else
+            else if (strictMode)
                 throw new InvalidOperationException("Not a JsonObject");
         }
 
@@ -254,7 +276,9 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj.ContainsKey(key);
-            throw new InvalidOperationException("Not a JsonObject");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
+            return false;
         }
 
         /// <inheritdoc/>
@@ -262,7 +286,9 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj.Remove(key);
-            throw new InvalidOperationException("Not a JsonObject");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
+            return false;
         }
 
         /// <inheritdoc/>
@@ -280,7 +306,11 @@ namespace EleCho.Json
                 return false;
             }
 
-            throw new InvalidOperationException("Not a JsonObject");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
+
+            value = null!;   // make compiler happy
+            return false;
         }
 
         /// <inheritdoc/>
@@ -288,7 +318,7 @@ namespace EleCho.Json
         {
             if (this.Value is JsonObject jObj)
                 jObj.Add(item.Key, item.Value.Value);
-            else
+            else if (strictMode)
                 throw new InvalidOperationException("Not a JsonObject");
         }
 
@@ -299,7 +329,7 @@ namespace EleCho.Json
                 jObj.Clear();
             else if (Value is JsonArray jArr)
                 jArr.Clear();
-            else
+            else if (strictMode)
                 throw new InvalidOperationException("Not a JsonObject or JsonArray");
         }
 
@@ -308,7 +338,11 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj.Contains(new KeyValuePair<string, IJsonData>(item.Key, item.Value.Value));
-            throw new InvalidOperationException("Not a JsonObject");
+
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
+
+            return false;
         }
 
         /// <inheritdoc/>
@@ -328,7 +362,8 @@ namespace EleCho.Json
                 return;
             }
 
-            throw new InvalidOperationException("Not a JsonObject");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
         }
 
         /// <inheritdoc/>
@@ -336,7 +371,9 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj && jObj.TryGetValue(item.Key, out IJsonData? jValue) && jValue == item.Value.Value)
                 return jObj.Remove(item.Key);
-            throw new InvalidOperationException("Not a JsonObject");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
+            return false;
         }
 
         /// <inheritdoc/>
@@ -348,8 +385,9 @@ namespace EleCho.Json
                     yield return new KeyValuePair<string, JsonAny>(pair.Key, new JsonAny(pair.Value));
                 yield break;
             }
-
-            throw new InvalidOperationException("Not a JsonObject");
+            
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -367,7 +405,9 @@ namespace EleCho.Json
                 yield break;
             }
 
-            throw new InvalidOperationException("Not a JsonObject or JsonArray");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject or JsonArray");
+            yield break;
         }
 
         /// <inheritdoc/>
@@ -375,7 +415,9 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr.IndexOf(item.Value);
-            throw new InvalidOperationException("Not a JsonArray");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonArray");
+            return -1;
         }
 
         /// <inheritdoc/>
@@ -383,7 +425,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 jArr.Insert(index, item.Value);
-            else
+            else if (strictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -392,7 +434,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 jArr.RemoveAt(index);
-            else
+            else if (strictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -401,7 +443,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 jArr.Add(item.Value);
-            else
+            else if (strictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -452,7 +494,9 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr.Contains(item.Value);
-            throw new InvalidOperationException("Not a JsonArray");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonArray");
+            return false;
         }
 
         /// <inheritdoc/>
@@ -472,7 +516,8 @@ namespace EleCho.Json
                 return;
             }
 
-            throw new InvalidOperationException("Not a JsonArray");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonArray");
         }
 
         /// <inheritdoc/>
@@ -480,7 +525,9 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr.Remove(item.Value);
-            throw new InvalidOperationException("Not a JsonArray");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonArray");
+            return false;
         }
 
         IEnumerator<JsonAny> IEnumerable<JsonAny>.GetEnumerator()
@@ -491,8 +538,10 @@ namespace EleCho.Json
                     yield return new JsonAny(jValue);
                 yield break;
             }
-
-            throw new InvalidOperationException("Not a JsonArray");
+            
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonArray");
+            yield break;
         }
 
         /// <summary>
@@ -504,7 +553,9 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj;
-            throw new InvalidOperationException("Not a JsonObject");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonObject");
+            return new JsonObject();
         }
         /// <summary>
         /// Cast value to JsonArray
@@ -515,7 +566,9 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr;
-            throw new InvalidOperationException("Not a JsonArray");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonArray");
+            return new JsonArray();
         }
         /// <summary>
         /// Cast value to JsonString
@@ -526,7 +579,9 @@ namespace EleCho.Json
         {
             if (Value is JsonString jStr)
                 return jStr;
-            throw new InvalidOperationException("Not a JsonString");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonString");
+            return new JsonString(string.Empty);
         }
         /// <summary>
         /// Cast value to JsonNumber
@@ -537,7 +592,9 @@ namespace EleCho.Json
         {
             if (Value is JsonNumber jNum)
                 return jNum;
-            throw new InvalidOperationException("Not a JsonNumber");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonNumber");
+            return new JsonNumber(0);
         }
         /// <summary>
         /// Cast value to JsonBoolean
@@ -548,7 +605,9 @@ namespace EleCho.Json
         {
             if (Value is JsonBoolean jBol)
                 return jBol;
-            throw new InvalidOperationException("Not a JsonBoolean");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonBoolean");
+            return JsonBoolean.False;
         }
         /// <summary>
         /// Cast value to JsonNull
@@ -559,7 +618,9 @@ namespace EleCho.Json
         {
             if (Value is JsonNull jNul)
                 return jNul;
-            throw new InvalidOperationException("Not a JsonNull");
+            if (strictMode)
+                throw new InvalidOperationException("Not a JsonNull");
+            return JsonNull.Null;
         }
 
         /// <summary>
