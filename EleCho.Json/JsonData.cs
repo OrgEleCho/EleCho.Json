@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -44,6 +45,12 @@ namespace EleCho.Json
 
         private static bool strictMode = true;
 
+        private static Dictionary<Type, IJsonDataHandler> handlers = new();
+
+        public static Dictionary<Type, IJsonDataHandler> Handlers
+        {
+            get => handlers;
+        }
 
         /// <summary>
         /// Get or set if exception will be thrown when error
@@ -141,6 +148,9 @@ namespace EleCho.Json
             if (obj is null)
                 return Null;
 
+            if (handlers.TryGetValue(typeof(TObj), out IJsonDataHandler handler))
+                return handler.FromValue(obj);
+
             Type type = obj.GetType();
             PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
@@ -213,6 +223,9 @@ namespace EleCho.Json
         public static object ToModelValue(Type modelType, JsonObject jsonObject)
         {
             object model;
+
+            if (handlers.TryGetValue(modelType, out IJsonDataHandler handler))
+                return handler.ToValue(jsonObject);
 
             model = Activator.CreateInstance(modelType)!;
             PropertyInfo[] props = modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance);

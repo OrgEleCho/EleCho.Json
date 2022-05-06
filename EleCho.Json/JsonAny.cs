@@ -13,12 +13,25 @@ namespace EleCho.Json
     /// </summary>
     public class JsonAny : IDictionary<string, JsonAny>, IList<JsonAny>
     {
-        private static bool strictMode = true;
+        private static bool strictMode = true;   // 全局的严格模式
+        private bool? selfStrictMode = null;     // 实例的严格模式
         /// <summary>
         /// Get or set if exception will be thrown when error
         /// 获取或设置当错误时是否抛出异常.
         /// </summary>
         public static bool StrictMode { get => strictMode; set => strictMode = value; }
+
+        /// <summary>
+        /// Get or set if exception will be thrown when error. (for this instance)
+        /// 获取或设置当错误时是否抛出异常. (for this instance)
+        /// </summary>
+        public bool SelfStrictMode
+        {
+            get => selfStrictMode ?? strictMode;
+            set => selfStrictMode = value;
+        }
+
+        private bool MixedStrictMode => selfStrictMode ?? strictMode;
 
         /// <summary>
         /// Value of this instance
@@ -33,7 +46,7 @@ namespace EleCho.Json
                 if (Value is JsonObject jObj)
                     return jObj.Keys;
 
-                if (strictMode)
+                if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonObject");
 
                 return Array.Empty<string>();
@@ -48,7 +61,7 @@ namespace EleCho.Json
                 if (Value is JsonObject jObj)
                     return new ValueCollection(jObj);
 
-                if (strictMode)
+                if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonObject");
 
                 return Array.Empty<JsonAny>();
@@ -67,7 +80,7 @@ namespace EleCho.Json
                 else if (Value is JsonString jStr)
                     return jStr.Value.Length;
 
-                if (strictMode)
+                if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonObject, JsonArray or JsonString");
 
                 return 0;
@@ -89,15 +102,15 @@ namespace EleCho.Json
             {
                 if (Value is JsonArray jArr)
                     return new JsonAny(jArr[index]);
-                if (strictMode)
+                if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonArray");
                 return JsonNull.Null;
             }
             set
             {
-                if (this.Value is JsonArray jArr)
+                if (Value is JsonArray jArr)
                     jArr[index] = value.Value;
-                else if (strictMode)
+                else if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonArray");
             }
         }
@@ -114,7 +127,7 @@ namespace EleCho.Json
             {
                 if (Value is JsonObject jObj)
                     return new JsonAny(jObj[key]);
-                if (strictMode)
+                if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonObject");
                 return JsonNull.Null;
             }
@@ -123,7 +136,7 @@ namespace EleCho.Json
             {
                 if (Value is JsonObject jObj)
                     jObj[key] = value.Value;
-                else if (strictMode)
+                else if (MixedStrictMode)
                     throw new InvalidOperationException("Not a JsonObject");
             }
         }
@@ -230,7 +243,7 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 jObj.Add(key, value.Value);
-            else if (strictMode)
+            else if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
         }
 
@@ -276,7 +289,7 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj.ContainsKey(key);
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
             return false;
         }
@@ -286,7 +299,7 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj.Remove(key);
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
             return false;
         }
@@ -306,7 +319,7 @@ namespace EleCho.Json
                 return false;
             }
 
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
 
             value = null!;   // make compiler happy
@@ -318,7 +331,7 @@ namespace EleCho.Json
         {
             if (this.Value is JsonObject jObj)
                 jObj.Add(item.Key, item.Value.Value);
-            else if (strictMode)
+            else if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
         }
 
@@ -329,7 +342,7 @@ namespace EleCho.Json
                 jObj.Clear();
             else if (Value is JsonArray jArr)
                 jArr.Clear();
-            else if (strictMode)
+            else if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject or JsonArray");
         }
 
@@ -339,7 +352,7 @@ namespace EleCho.Json
             if (Value is JsonObject jObj)
                 return jObj.Contains(new KeyValuePair<string, IJsonData>(item.Key, item.Value.Value));
 
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
 
             return false;
@@ -362,7 +375,7 @@ namespace EleCho.Json
                 return;
             }
 
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
         }
 
@@ -371,7 +384,7 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj && jObj.TryGetValue(item.Key, out IJsonData? jValue) && jValue == item.Value.Value)
                 return jObj.Remove(item.Key);
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
             return false;
         }
@@ -386,7 +399,7 @@ namespace EleCho.Json
                 yield break;
             }
             
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
         }
 
@@ -405,7 +418,7 @@ namespace EleCho.Json
                 yield break;
             }
 
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject or JsonArray");
             yield break;
         }
@@ -415,7 +428,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr.IndexOf(item.Value);
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
             return -1;
         }
@@ -425,7 +438,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 jArr.Insert(index, item.Value);
-            else if (strictMode)
+            else if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -434,7 +447,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 jArr.RemoveAt(index);
-            else if (strictMode)
+            else if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -443,7 +456,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 jArr.Add(item.Value);
-            else if (strictMode)
+            else if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -494,7 +507,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr.Contains(item.Value);
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
             return false;
         }
@@ -516,7 +529,7 @@ namespace EleCho.Json
                 return;
             }
 
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
         }
 
@@ -525,7 +538,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr.Remove(item.Value);
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
             return false;
         }
@@ -539,7 +552,7 @@ namespace EleCho.Json
                 yield break;
             }
             
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
             yield break;
         }
@@ -553,7 +566,7 @@ namespace EleCho.Json
         {
             if (Value is JsonObject jObj)
                 return jObj;
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonObject");
             return new JsonObject();
         }
@@ -566,7 +579,7 @@ namespace EleCho.Json
         {
             if (Value is JsonArray jArr)
                 return jArr;
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonArray");
             return new JsonArray();
         }
@@ -579,7 +592,7 @@ namespace EleCho.Json
         {
             if (Value is JsonString jStr)
                 return jStr;
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonString");
             return new JsonString(string.Empty);
         }
@@ -592,7 +605,7 @@ namespace EleCho.Json
         {
             if (Value is JsonNumber jNum)
                 return jNum;
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonNumber");
             return new JsonNumber(0);
         }
@@ -605,7 +618,7 @@ namespace EleCho.Json
         {
             if (Value is JsonBoolean jBol)
                 return jBol;
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonBoolean");
             return JsonBoolean.False;
         }
@@ -618,7 +631,7 @@ namespace EleCho.Json
         {
             if (Value is JsonNull jNul)
                 return jNul;
-            if (strictMode)
+            if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonNull");
             return JsonNull.Null;
         }

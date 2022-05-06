@@ -8,8 +8,9 @@
     <PackageReadmeFile>readme.md</PackageReadmeFile>	  
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	  <Version>1.0.2</Version>
+	  <Version>1.1.1</Version>
 	  <PackageIcon>logo-128x128.png</PackageIcon>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
