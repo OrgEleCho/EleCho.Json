@@ -47,6 +47,9 @@ namespace EleCho.Json
 
         private static Dictionary<Type, IJsonDataHandler> handlers = new();
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static Dictionary<Type, IJsonDataHandler> Handlers
         {
             get => handlers;
@@ -90,10 +93,11 @@ namespace EleCho.Json
                 decimal n => (JsonNumber)(double)n,
                 string s => new JsonString(s),
 
+                IJsonData json => json,
+
                 IList list => FromArrayValue(list),
                 IDictionary dict => FromObjectValue(dict),
-
-                IJsonData json => json,
+                IConvertible v => new JsonString(v.ToString()!),
 
                 _ => FromModelValue(value),
             };
@@ -148,7 +152,7 @@ namespace EleCho.Json
             if (obj is null)
                 return Null;
 
-            if (handlers.TryGetValue(typeof(TObj), out IJsonDataHandler handler))
+            if (handlers.TryGetValue(typeof(TObj), out IJsonDataHandler? handler))
                 return handler.FromValue(obj);
 
             Type type = obj.GetType();
@@ -224,7 +228,7 @@ namespace EleCho.Json
         {
             object model;
 
-            if (handlers.TryGetValue(modelType, out IJsonDataHandler handler))
+            if (handlers.TryGetValue(modelType, out IJsonDataHandler? handler))
                 return handler.ToValue(jsonObject);
 
             model = Activator.CreateInstance(modelType)!;
@@ -429,50 +433,51 @@ namespace EleCho.Json
         {
             object num;
 
-            if (TypeDecimal == numType)
+            if (TypeByte == numType)
             {
-                num = (decimal)jsonNumber.Value;
-            }
-            else if (TypeDouble == numType)
-            {
-                num = jsonNumber.Value;
-            }
-            else if (TypeFloat == numType)
-            {
-                num = (float)jsonNumber.Value;
-            }
-            else if (TypeULong == numType)
-            {
-                num = (ulong)jsonNumber.Value;
-            }
-            else if (TypeLong == numType)
-            {
-                num = (long)jsonNumber.Value;
-            }
-            else if (TypeUInt == numType)
-            {
-                num = (uint)jsonNumber.Value;
-            }
-            else if (TypeInt == numType)
-            {
-                num = (int)jsonNumber.Value;
-            }
-            else if (TypeUShort == numType)
-            {
-                num = (ushort)jsonNumber.Value;
-            }
-            else if (TypeShort == numType)
-            {
-                num = (short)jsonNumber.Value;
+                num = jsonNumber.GetByteValue();
             }
             else if (TypeSByte == numType)
             {
-                num = (sbyte)jsonNumber.Value;
+                num = jsonNumber.GetSByteValue();
             }
-            else if (TypeByte == numType)
+            else if (TypeShort == numType)
             {
-                num = (byte)jsonNumber.Value;
+                num = jsonNumber.GetShortValue();
             }
+            else if (TypeUShort == numType)
+            {
+                num = jsonNumber.GetUShortValue();
+            }
+            else if (TypeInt == numType)
+            {
+                num = jsonNumber.GetIntValue();
+            }
+            else if (TypeUInt == numType)
+            {
+                num = jsonNumber.GetUIntValue();
+            }
+            else if (TypeLong == numType)
+            {
+                num = jsonNumber.GetLongValue();
+            }
+            else if (TypeULong == numType)
+            {
+                num = jsonNumber.GetULongValue();
+            }
+            else if (TypeDouble == numType)
+            {
+                num = jsonNumber.GetDoubleValue();
+            }
+            else if (TypeFloat == numType)
+            {
+                num = jsonNumber.GetFloatValue();
+            }
+            else if (TypeDecimal == numType)
+            {
+                num = jsonNumber.GetDecimalValue();
+            }
+
             else if (TypeJsonNumber == numType)
             {
                 num = jsonNumber;
@@ -562,7 +567,7 @@ namespace EleCho.Json
             {
                 try
                 {
-                    target = ToNumberValue(targetType, new JsonNumber(jsonBoolean.Value ? 1 : 0));
+                    target = ToNumberValue(targetType, new JsonNumber(jsonBoolean.Value ? "1" : "0"));
                 }
                 catch (ArgumentException)
                 {

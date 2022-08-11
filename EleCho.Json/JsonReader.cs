@@ -152,7 +152,7 @@ namespace EleCho.Json
         /// <returns></returns>
         internal JsonNumber InternalReadNumber()
         {
-            return new JsonNumber(double.Parse(lexer.ReadToken().Value!));
+            return new JsonNumber(lexer.ReadToken().Value!);
         }
 
         /// <summary>

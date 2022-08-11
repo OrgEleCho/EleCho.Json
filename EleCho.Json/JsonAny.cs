@@ -212,10 +212,91 @@ namespace EleCho.Json
         /// Create an instance of <see cref="JsonAny"/>
         /// </summary>
         /// <param name="data"></param>
+        public JsonAny(byte data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(sbyte data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(short data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(ushort data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(int data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(uint data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(long data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(ulong data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
         public JsonAny(double data)
         {
-            Value = new JsonNumber(data);
+            Value = new JsonNumber(Convert.ToString(data));
         }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(float data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+        /// <summary>
+        /// Create an instance of <see cref="JsonAny"/>
+        /// </summary>
+        /// <param name="data"></param>
+        public JsonAny(decimal data)
+        {
+            Value = new JsonNumber(Convert.ToString(data));
+        }
+
 
         /// <summary>
         /// Create an instance of <see cref="JsonAny"/>
@@ -607,7 +688,7 @@ namespace EleCho.Json
                 return jNum;
             if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonNumber");
-            return new JsonNumber(0);
+            return new JsonNumber("0");
         }
         /// <summary>
         /// Cast value to JsonBoolean
@@ -634,6 +715,218 @@ namespace EleCho.Json
             if (MixedStrictMode)
                 throw new InvalidOperationException("Not a JsonNull");
             return JsonNull.Null;
+        }
+
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public byte ByteValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetByteValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public sbyte SByteValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetSByteValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public short ShortValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetShortValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public ushort UShortValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetUShortValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public int IntValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetIntValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public uint UIntValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetUIntValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public long LongValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetLongValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public ulong ULongValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetULongValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public double DoubleValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetDoubleValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public float FloatValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetFloatValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+        /// <summary>
+        /// Cast value to JsonNumber then get it's value
+        /// </summary>
+        /// <returns>Number value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonNumber</exception>
+        public decimal DecimalValue
+        {
+            get
+            {
+                if (Value is JsonNumber jNum)
+                    return jNum.GetDecimalValue();
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonNumber");
+                return 0;
+            }
+        }
+
+
+        /// <summary>
+        /// Cast value to JsonString then get it's value
+        /// </summary>
+        /// <returns>String value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonString</exception>
+        public string StringValue
+        {
+            get
+            {
+                if (Value is JsonString jStr)
+                    return jStr.Value;
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonString");
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Cast value to JsonBoolean then get it's value
+        /// </summary>
+        /// <returns>Boolean value</returns>
+        /// <exception cref="InvalidOperationException">Value is not JsonBoolean</exception>
+        public bool BooleanValue
+        {
+            get
+            {
+                if (Value is JsonBoolean jBol)
+                    return jBol.Value;
+                if (MixedStrictMode)
+                    throw new InvalidOperationException("Not a JsonBoolean");
+                return false;
+            }
         }
 
         /// <summary>

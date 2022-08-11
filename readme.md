@@ -10,7 +10,7 @@ The document is available in English and Chinese, just scroll down.
 
 ## English
 
-This library is primarily for simple JSON operations that are fast and don't require complex features, such as primitive type conversions.
+This library is primarily for simple JSON operations that are high performance, have low resource usage, and don't require complex features, such as primitive type conversions.
 
 Various JSON object stores
 
@@ -172,7 +172,7 @@ jAny.GetEnumerator(); // If jAny is not enumerable, return an enumerator with no
 
 ## 简体中文
 
-这个库主要是追求较高速率的, 不要求复杂特性的简易 JSON 操作, 例如最基本类型的转换.
+这个库主要是追求较高性能低占用的, 不要求复杂特性的简易 JSON 操作, 例如最基本类型的转换.
 
 各种 JSON 对象存储
 

@@ -110,10 +110,11 @@ namespace EleCho.Json
 
             if (cur == '.')
             {
+                reader.Read();   // skip the char. 跳过字符
                 sb.Append((char)cur);
                 while (cur != -1)
                 {
-                    reader.Peek();
+                    cur = reader.Peek();
                     if (cur >= '0' && cur <= '9')
                     {
                         reader.Read();   // skip the char. 跳过字符

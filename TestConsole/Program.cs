@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using EleCho.Json;
 using Newtonsoft.Json.Linq;
+using TestConsole.Properties;
 
 namespace TestConsole
 {
@@ -20,24 +21,39 @@ namespace TestConsole
 
         static void SpeedTest()
         {
-            string jsonToRead = "{\"paramz\": {\"feeds\": [{\"id\": 299076, \"oid\": 288340, \"category\": \"article\", \"data\": {\"subject\": \"Benchmark\", \"summary\": \" abc\", \"cover\": \"/oman001/article/details/79063278\", \"pic\": \"null\", \"format\": \"txt\", \"changed\": \"2015-09-22 16:01:41\"}}, {\"id\": 299078, \"oid\": 288340, \"category\": \"article\", \"data\": {\"subject\": \"Benchmark\", \"summary\": \" abc\", \"cover\": \"/oman001/article/details/79063278\", \"pic\": \"null\", \"format\": \"txt\", \"changed\": \"2012-09-22 16:01:41\"}}, {\"id\": 299065, \"oid\": 288340, \"category\": \"article\", \"data\": {\"subject\": \"Benchmark\", \"summary\": \" abc\", \"cover\": \"/oman001/article/details/79063278\", \"pic\": \"null\", \"format\": \"txt\", \"changed\": \"2019-09-22 16:01:41\"}}], \"PageIndex\": 1, \"PageSize\": 20, \"TotalCount\": 535821, \"TotalPage\": 2677}}";
+            string jsonToRead = Resources.j2;
 
             Stopwatch stopwatch = new Stopwatch();
 
             Console.Write("\n\n\n\n\n");
             Console.WriteLine("SpeedTest:");
 
-            stopwatch.Start();
-            for (int i = 0; i < 1000; i++)
+            int count = 10;
+            for (int i = 0; i < count; i++)
             {
-                _ = new JsonReader(new StringReader(jsonToRead)).Read();
+                _ = JsonReader.Read(jsonToRead);
+            }
+            for (int i = 0; i < count; i++)
+            {
+                _ = System.Text.Json.JsonDocument.Parse(jsonToRead);
+            }
+            for (int i = 0; i < count; i++)
+            {
+                _ = JObject.Parse(jsonToRead);
+            }
+
+
+            stopwatch.Start();
+            for (int i = 0; i < count; i++)
+            {
+                _ = JsonReader.Read(jsonToRead);
             }
             stopwatch.Stop();
             Console.WriteLine("EleCho.Json > JsonSerializer.Deserialize: " + stopwatch.ElapsedMilliseconds + "ms");
 
             stopwatch.Reset();
             stopwatch.Start();
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < count; i++)
             {
                 _ = System.Text.Json.JsonDocument.Parse(jsonToRead);
             }
@@ -46,12 +62,17 @@ namespace TestConsole
 
             stopwatch.Reset();
             stopwatch.Start();
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < count; i++)
             {
                 _ = JObject.Parse(jsonToRead);
             }
             stopwatch.Stop();
             Console.WriteLine("Newtonsoft.Json > JObject.Parse: " + stopwatch.ElapsedMilliseconds + "ms");
+        }
+
+        static void CheckJson(string json)
+        {
+            var reader = new StringReader(json);
         }
 
         static void UserDefinedHandlerTest()
